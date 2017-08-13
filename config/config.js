@@ -5,7 +5,8 @@ if (process.env.NODE_ENV === 'production') {
   module.exports = {
     host: process.env.host,
     db: process.env.db,
-    secret: process.env.secret
+    secret: process.env.secret,
+    privateKey: process.env.privateKey
   }
 } else {
   //load data from development.json

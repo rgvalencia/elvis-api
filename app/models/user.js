@@ -6,7 +6,7 @@ const Schema = mongoose.Schema;
 
 // Create a schema that defines the structure for storing user data
 const UserSchema = new Schema({
-  username: {
+  email: {
     type: String,
     required: true,
     unique: true
