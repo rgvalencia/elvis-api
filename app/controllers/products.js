@@ -84,7 +84,7 @@ module.exports = router => {
       });
     });
 
-    router.post('/products/:id/like', function (req, res) {
+    router.post('/products/:id/like', guard.check('client'), function (req, res) {
       Product.findById(req.params.id, function(err, product) {
         if (err) {
           res.status(404).json(err);
@@ -100,7 +100,7 @@ module.exports = router => {
       });
     });
 
-    router.delete('/products/:id/dislike', function (req, res) {
+    router.delete('/products/:id/dislike', guard.check('client'), function (req, res) {
       Like.findOne({
         _creator: req.user.id,
         _product: req.params.id
@@ -111,7 +111,7 @@ module.exports = router => {
       });
     });
 
-    router.post('/products/:id/buy', function(req, res) {
+    router.post('/products/:id/buy', guard.check('client'), function(req, res) {
       Product.findById(req.params.id, function(err, product) {
         if (err) return res.status(404).json({error: 'This product does not exist'});
         if (product.stock < 1) return res.status(422).json({error: 'This product is out of stock'});
