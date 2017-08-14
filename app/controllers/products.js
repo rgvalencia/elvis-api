@@ -86,14 +86,17 @@ module.exports = router => {
 
     router.post('/products/:id/like', guard.check('client'), function (req, res) {
       Product.findById(req.params.id, function(err, product) {
-        if (err) {
-          res.status(404).json(err);
+        if (err && err.name === 'CastError') {
+          res.status(404).json({error: 'This product does not exist'});
         } else {
           Like.create({
             _creator: req.user.id, // assign the _id from the user
             _product: product._id // assign the _id from the product
           }, function (err, user) {
-            if (err) return res.status(422).json(err);
+            if (err && err.code === 11000) {
+              res.status(422).json({error: 'You have already like this product.'});
+            }
+
             res.json();
           });
         }
@@ -105,7 +108,7 @@ module.exports = router => {
         _creator: req.user.id,
         _product: req.params.id
       }, function(err, like) {
-        if (err) return res.status(404).json(err);
+        if (!like) return res.status(422).json({error: 'You can not give dislike to a product that you do not follow.'});
         like.remove();
         res.json();
       });
