@@ -1,10 +1,9 @@
 'use strict';
 
-const util   = require('../helpers/util');
-const User   = require('../models/user');
-const config = require('../../config/config');
-const jwt    = require('express-jwt'); 
-const utilx = require('util');
+const util   = require('../helpers/util'),
+      User   = require('../models/user'),
+      config = require('../../config/config'),
+      jwt    = require('express-jwt');
 
 module.exports = router => {
   router
