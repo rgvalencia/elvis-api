@@ -4,9 +4,9 @@ const util   = require('../helpers/util'),
       User   = require('../models/user');
 
 module.exports = router => {
-  router.route('/users/:id')
+  router.route('/users/me')
     .get(function (req, res) {
-      User.findById(req.params.id, function(err, user) {
+      User.findById(req.user.id, function(err, user) {
         if (err) {
           res.status(err.statusCode || 500).json(err);
         } else {
@@ -15,7 +15,7 @@ module.exports = router => {
       });
     })
     .put(function (req, res) {
-      User.findOneAndUpdate({_id: req.params.id}, req.body, {new: true}, function(err, user) {
+      User.findOneAndUpdate({_id: req.user.id}, req.body, {new: true}, function(err, user) {
         if (err) {
           res.status(err.statusCode || 500).json(err);
         } else {
