@@ -6,8 +6,23 @@ const Schema = mongoose.Schema;
 
 const ProductSchema = new Schema({
   name: { type: String, required: true },
-  price: { type: Number, min: 1, required: true },
-  stock: { type: Number, min: 0, required: true },
+  price: {
+    type: Number,
+    required: true,
+    validate : {
+      validator : Number.isInteger,
+      message   : '{VALUE} represents the price in cents. Must be an integer.'
+    }
+  },
+  stock: {
+    type: Number,
+    min: 0,
+    required: true,
+    validate : {
+      validator : Number.isInteger,
+      message   : '{VALUE} is not an integer value.'
+    }
+  },
   likes: { type: Number, default: 0 },
   created_at: { type: Date, default: Date.now },
   logs: {

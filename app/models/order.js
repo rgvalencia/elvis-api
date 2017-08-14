@@ -9,9 +9,22 @@ const Product = require('../models/product');
 const OrderSchema = new Schema({
   _buyer: { type: Schema.Types.ObjectId, ref: 'User' },
   _product: { type: Schema.Types.ObjectId, ref: 'Product' },
-  unit_price: { type: Number, min: 1 },
-  quantity: { type: Number, min: 1, required: true },
-  total: { type: Number, min: 1 },
+  unit_price: {
+    type: Number,
+    validate : {
+      validator : Number.isInteger,
+      message   : '{VALUE} represents the price in cents. Must be an integer.'
+    }
+  },
+  quantity: {
+    type: Number, min: 1,
+    required: true,
+    validate : {
+      validator : Number.isInteger,
+      message   : '{VALUE} is not an integer value.'
+    }
+   },
+  total: { type: Number },
   pay_type: {
     type: [{
       type: String,
