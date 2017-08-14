@@ -1,6 +1,7 @@
 'use strict';
 
 const Product = require('../models/product'),
+      Order = require('../models/order'),
       Log = require('../models/log'),
       Like = require('../models/like'),
       util    = require('util'),
@@ -107,6 +108,28 @@ module.exports = router => {
         if (err) return res.status(404).json(err);
         like.remove();
         res.json();
+      });
+    });
+
+    router.post('/products/:id/buy', function(req, res) {
+      Product.findById(req.params.id, function(err, product) {
+        if (err) return res.status(404).json({error: 'This product does not exist'});
+        if (product.stock < 1) return res.status(422).json({error: 'This product is out of stock'});
+
+        let order = new Order({
+          _buyer: req.user.id,
+          _product: product.id,
+          unit_price: product.price,
+          quantity: req.body.quantity,
+          total: product.price * req.body.quantity,
+          pay_type: req.body.pay_type
+        });
+
+        order.save(function (err) {
+          if (err) return res.status(422).json({error: err.message});
+
+          res.json(order);
+        });
       });
     });
 
