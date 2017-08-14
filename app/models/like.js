@@ -27,4 +27,10 @@ LikeSchema.post('remove', function(doc) {
 });
 
 // set up a mongoose model and pass it using module.exports
-module.exports = mongoose.model('Like', LikeSchema);
+let Like = mongoose.model('Like', LikeSchema);
+
+Like.on('index', function(err) {
+  if (err) console.log(error.message);
+});
+
+module.exports = Like;
