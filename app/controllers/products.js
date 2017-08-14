@@ -1,6 +1,7 @@
 'use strict';
 
 const Product = require('../models/product'),
+      Log = require('../models/log'),
       util    = require('util'),
       guard   = require('express-jwt-permissions')({ permissionsProperty: 'scope' });
 
@@ -47,12 +48,27 @@ module.exports = router => {
       });
     })
     .put(guard.check('admin'), function (req, res) {
-      Product.findOneAndUpdate({_id: req.params.id}, { stock: req.body.stock, price: req.body.price }, {new: true}, function(err, product) {
-        if (err) {
-          res.status(err.statusCode || 500).json(err);
-        } else {
-          res.json(product);
-        }
+      Product.findById(req.params.id, function (err, product) {
+        if (err) return res.status(404).json(err);
+        
+        let log = new Log({
+          _creator: req.user.id, // assign the _id from the user
+          _product: product._id, // assign the _id from the product
+          oldPrice: product.price,
+          newPrice: req.body.price
+        });
+
+        product.stock = req.body.stock;
+        product.price = req.body.price;
+        product.save(function (err, updatedProduct) {
+          if (err) return res.status(422).json(err);
+
+          log.save(function (err, logx) {
+            if (err) return res.status(422).json(err);
+            res.json(updatedProduct);
+          });
+
+        });
       });
     })
     .delete(guard.check('admin'), function (req, res) {
