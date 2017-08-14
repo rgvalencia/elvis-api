@@ -29,7 +29,11 @@ module.exports = router => {
       });
     })
     .post(guard.check('admin'), function(req, res) {
-      Product.create(req.body, function (err, product) {
+      Product.create({
+        name: req.body.name,
+        price: req.body.price,
+        stock: req.body.stock
+      }, function (err, product) {
         if (err) {
           res.status(err.statusCode || 500).json(err);
         } else {
