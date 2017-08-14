@@ -7,7 +7,7 @@ const Schema = mongoose.Schema;
 const ProductSchema = new Schema({
   name: { type: String, required: true },
   price: { type: Number, min: 1, required: true },
-  stock: { type: Number, min: 1, required: true },
+  stock: { type: Number, min: 0, required: true },
   likes: { type: Number, default: 0 },
   created_at: { type: Date, default: Date.now },
   logs: {
