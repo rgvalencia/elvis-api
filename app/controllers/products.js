@@ -7,18 +7,23 @@ const Product = require('../models/product'),
 module.exports = router => {
   router.route('/products')
     .get(function (req, res) {
-      Product.
-        find({}).
-        where('stock').gt(0). // indicates availability
-        sort({ name: -1, likes: -1 }).
-        select('name price stock created_at').
-        exec(function(err, products) {
-          if (err) {
-            res.status(err.statusCode || 500).json(err);
-          } else {
-            res.json(products);
-          }
-        });
+
+      let query = Product.find({});
+
+      if (req.query.q) {
+        query.where('name').equals(req.query.q);
+      }
+
+      query.where('stock').gt(0); // indicates availability
+      query.sort({ name: -1, likes: -1 });
+      query.select('name price stock created_at');
+      query.exec(function(err, products) {
+        if (err) {
+          res.status(err.statusCode || 500).json(err);
+        } else {
+          res.json(products);
+        }
+      });
     })
     .post(guard.check('admin'), function(req, res) {
       Product.create(req.body, function (err, product) {
