@@ -18,8 +18,13 @@ module.exports = router => {
       }
 
       query.where('stock').gt(0); // indicates availability
-      query.sort({ name: -1, likes: -1 });
-      query.select('name price stock created_at');
+      if (req.query.sort_by === 'popularity') {
+        query.sort('-likes');
+      } else {
+        query.sort('-name');
+      }
+
+      query.select('name price stock likes created_at');
       query.exec(function(err, products) {
         if (err) {
           res.status(err.statusCode || 500).json(err);
