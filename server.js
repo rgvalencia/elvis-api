@@ -3,14 +3,17 @@
 const express     = require('express'),
       router      = express.Router(),
       app         = express(),
+      jwt         = require('express-jwt'),
       morgan      = require('morgan'),
       bodyParser  = require('body-parser'),
       db          = require('./config/database'),
+      util        = require('util'),
       config      = require('./config/config');
 
 //controllers
 require('./app/controllers/tokens')(router);
 require('./app/controllers/users')(router);
+require('./app/controllers/products')(router);
 
 const port = process.env.PORT || 3000;
 
@@ -26,6 +29,13 @@ app.use(function(req, res, next) {
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
   next();
 });
+
+app.use(jwt({ secret: config.secret}).unless(function(req) {
+  return (
+    req.originalUrl === '/api/products' && req.method === 'GET' ||
+    req.originalUrl === '/api/users' && req.method === 'POST'
+  );
+}));
 
 app.use('/api', router);
 

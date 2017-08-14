@@ -1,15 +1,9 @@
 'use strict';
 
 const util   = require('../helpers/util'),
-      User   = require('../models/user'),
-      config = require('../../config/config'),
-      jwt    = require('express-jwt');
+      User   = require('../models/user');
 
 module.exports = router => {
-  router
-    .use(jwt({ secret: config.secret})
-    .unless({ path: ['/api/users'] }));
-
   router.route('/users/:id')
     .get(function (req, res) {
       User.findById(req.params.id, function(err, user) {
@@ -45,6 +39,6 @@ module.exports = router => {
           res.json(user);
         }
       })
-    });
+  });
 
 };
