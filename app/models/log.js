@@ -4,7 +4,6 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-// Create a schema that defines the structure for storing user data
 const LogSchema = new Schema({
   _creator: { type: Schema.Types.ObjectId, ref: 'User' },
   _product: { type: Schema.Types.ObjectId, ref: 'Product' },

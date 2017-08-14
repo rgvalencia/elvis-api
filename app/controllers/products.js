@@ -2,6 +2,7 @@
 
 const Product = require('../models/product'),
       Log = require('../models/log'),
+      Like = require('../models/like'),
       util    = require('util'),
       guard   = require('express-jwt-permissions')({ permissionsProperty: 'scope' });
 
@@ -42,7 +43,6 @@ module.exports = router => {
         if (err) {
           res.status(err.statusCode || 500).json(err);
         } else {
-          console.log(util.inspect(product, false, null))
           res.json(product);
         }
       });
@@ -50,7 +50,7 @@ module.exports = router => {
     .put(guard.check('admin'), function (req, res) {
       Product.findById(req.params.id, function (err, product) {
         if (err) return res.status(404).json(err);
-        
+
         let log = new Log({
           _creator: req.user.id, // assign the _id from the user
           _product: product._id, // assign the _id from the product
@@ -63,7 +63,7 @@ module.exports = router => {
         product.save(function (err, updatedProduct) {
           if (err) return res.status(422).json(err);
 
-          log.save(function (err, logx) {
+          log.save(function (err, result) {
             if (err) return res.status(422).json(err);
             res.json(updatedProduct);
           });
@@ -80,6 +80,33 @@ module.exports = router => {
         } else {
           res.json({ message: 'Product successfully deleted' });
         }
+      });
+    });
+
+    router.post('/products/:id/like', function (req, res) {
+      Product.findById(req.params.id, function(err, product) {
+        if (err) {
+          res.status(404).json(err);
+        } else {
+          Like.create({
+            _creator: req.user.id, // assign the _id from the user
+            _product: product._id // assign the _id from the product
+          }, function (err, user) {
+            if (err) return res.status(422).json(err);
+            res.json();
+          });
+        }
+      });
+    });
+
+    router.delete('/products/:id/dislike', function (req, res) {
+      Like.findOne({
+        _creator: req.user.id,
+        _product: req.params.id
+      }, function(err, like) {
+        if (err) return res.status(404).json(err);
+        like.remove();
+        res.json();
       });
     });
 

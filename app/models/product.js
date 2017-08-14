@@ -4,12 +4,11 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-// Create a schema that defines the structure for storing user data
 const ProductSchema = new Schema({
   name: { type: String, required: true },
   price: { type: Number, min: 1, required: true },
   stock: { type: Number, min: 1, required: true },
-  likes: { type: Number, min: 0 },
+  likes: { type: Number, default: 0 },
   created_at: { type: Date, default: Date.now },
   logs: {
     type: [{type : Schema.Types.ObjectId, ref: 'Log', select: false}],
