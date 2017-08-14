@@ -41,20 +41,21 @@ module.exports = router => {
   router.route('/products/:id')
     .get(function (req, res) {
       Product.findById(req.params.id, function(err, product) {
-        if (err) {
-          res.status(err.statusCode || 500).json(err);
-        } else {
-          res.json(product);
+        if (err && err.name === 'CastError') {
+          res.status(404).json({error: 'This product does not exist'});
         }
+        res.json(product);
       });
     })
     .put(guard.check('admin'), function (req, res) {
       Product.findById(req.params.id, function (err, product) {
-        if (err) return res.status(404).json(err);
+        if (err && err.name === 'CastError') {
+          res.status(404).json({error: 'This product does not exist'});
+        }
 
         let log = new Log({
           _creator: req.user.id, // assign the _id from the user
-          _product: product._id, // assign the _id from the product
+          _product: product.id, // assign the _id from the product
           oldPrice: product.price,
           newPrice: req.body.price
         });
@@ -62,10 +63,12 @@ module.exports = router => {
         product.stock = req.body.stock;
         product.price = req.body.price;
         product.save(function (err, updatedProduct) {
-          if (err) return res.status(422).json(err);
+          if (err) return res.status(422).json({error: err.message});
 
           log.save(function (err, result) {
-            if (err) return res.status(422).json(err);
+            if (err) {
+              res.status(422).json(err);
+            }
             res.json(updatedProduct);
           });
 
@@ -76,8 +79,8 @@ module.exports = router => {
       Product.remove({
         _id: req.params.id
       }, function(err, product) {
-        if (err) {
-          res.status(err.statusCode || 500).json(err);
+        if (err && err.name === 'CastError') {
+          res.status(404).json({error: 'This product does not exist'});
         } else {
           res.json({ message: 'Product successfully deleted' });
         }
@@ -86,14 +89,17 @@ module.exports = router => {
 
     router.post('/products/:id/like', guard.check('client'), function (req, res) {
       Product.findById(req.params.id, function(err, product) {
-        if (err) {
-          res.status(404).json(err);
+        if (err && err.name === 'CastError') {
+          res.status(404).json({error: 'This product does not exist'});
         } else {
           Like.create({
             _creator: req.user.id, // assign the _id from the user
             _product: product._id // assign the _id from the product
           }, function (err, user) {
-            if (err) return res.status(422).json(err);
+            if (err && err.code === 11000) {
+              res.status(422).json({error: 'You have already like this product.'});
+            }
+
             res.json();
           });
         }
@@ -105,7 +111,7 @@ module.exports = router => {
         _creator: req.user.id,
         _product: req.params.id
       }, function(err, like) {
-        if (err) return res.status(404).json(err);
+        if (!like) return res.status(422).json({error: 'You can not give dislike to a product that you do not follow.'});
         like.remove();
         res.json();
       });
