@@ -1,15 +1,16 @@
 'use strict';
 
-const express     = require('express');
-const app         = express();
-const morgan      = require('morgan');
-const bodyParser  = require('body-parser');
-const mongoose    = require('mongoose');
+const express     = require('express'),
+      router      = express.Router(),
+      app         = express(),
+      morgan      = require('morgan'),
+      bodyParser  = require('body-parser'),
+      db          = require('./config/database'),
+      config      = require('./config/config');
 
-const db          = require('./config/database');
-const config      = require('./config/config');
-
-const User   = require('./app/models/user');
+//controllers
+require('./app/controllers/tokens')(router);
+require('./app/controllers/users')(router);
 
 const port = process.env.PORT || 3000;
 
@@ -20,8 +21,16 @@ app.use(bodyParser.json());
 // use morgan to log requests to the console
 app.use(morgan('dev'));
 
-app.get('/', function(req, res) {
-  res.json('Hello!');
+app.use('/api', router);
+
+app.use(function(req, res) {
+  res.status(404).json({url: req.originalUrl + ' not found'})
+});
+
+app.use(function (err, req, res, next) {
+  if (err.name === 'UnauthorizedError') {
+    res.status(401).json({error: 'invalid token'});
+  }
 });
 
 app.listen(port);
