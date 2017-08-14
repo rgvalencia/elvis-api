@@ -32,8 +32,9 @@ app.use(function(req, res, next) {
 
 app.use(jwt({ secret: config.secret}).unless(function(req) {
   return (
-    req.originalUrl === '/api/products' && req.method === 'GET' ||
-    req.originalUrl === '/api/users' && req.method === 'POST'
+     /^(\/api\/products.*)$/.test(req.originalUrl) && req.method === 'GET' ||
+    req.originalUrl === '/api/users' && req.method === 'POST' ||
+    req.originalUrl === '/api/auth/token' && req.method === 'POST'
   );
 }));
 
