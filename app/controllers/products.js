@@ -20,7 +20,7 @@ module.exports = router => {
           }
         });
     })
-    .post(function(req, res) {
+    .post(guard.check('admin'), function(req, res) {
       Product.create(req.body, function (err, product) {
         if (err) {
           res.status(err.statusCode || 500).json(err);
@@ -41,7 +41,7 @@ module.exports = router => {
         }
       });
     })
-    .put(function (req, res) {
+    .put(guard.check('admin'), function (req, res) {
       Product.findOneAndUpdate({_id: req.params.id}, { stock: req.body.stock, price: req.body.price }, {new: true}, function(err, product) {
         if (err) {
           res.status(err.statusCode || 500).json(err);
@@ -50,7 +50,7 @@ module.exports = router => {
         }
       });
     })
-    .delete(function (req, res) {
+    .delete(guard.check('admin'), function (req, res) {
       Product.remove({
         _id: req.params.id
       }, function(err, product) {
