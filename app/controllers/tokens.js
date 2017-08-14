@@ -21,8 +21,11 @@ module.exports = router => {
           res.status(422).json({ success: false, message: 'Authentication failed. Wrong password.' });
         } else {
           res.json({
-            token: jwt.sign(user, config.secret, {
-              expiresIn: '1h'
+            token: jwt.sign({
+              id: user._id,
+              scope: req.body.scope || 'client'
+            }, config.secret, {
+              expiresIn: '2h'
             })
           });
         }   
