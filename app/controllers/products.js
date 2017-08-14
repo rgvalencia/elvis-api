@@ -30,4 +30,36 @@ module.exports = router => {
       })
     });
 
+  router.route('/products/:id')
+    .get(function (req, res) {
+      Product.findById(req.params.id, function(err, product) {
+        if (err) {
+          res.status(err.statusCode || 500).json(err);
+        } else {
+          console.log(util.inspect(product, false, null))
+          res.json(product);
+        }
+      });
+    })
+    .put(function (req, res) {
+      Product.findOneAndUpdate({_id: req.params.id}, { stock: req.body.stock, price: req.body.price }, {new: true}, function(err, product) {
+        if (err) {
+          res.status(err.statusCode || 500).json(err);
+        } else {
+          res.json(product);
+        }
+      });
+    })
+    .delete(function (req, res) {
+      Product.remove({
+        _id: req.params.id
+      }, function(err, product) {
+        if (err) {
+          res.status(err.statusCode || 500).json(err);
+        } else {
+          res.json({ message: 'Product successfully deleted' });
+        }
+      });
+    });
+
 };
