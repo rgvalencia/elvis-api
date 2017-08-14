@@ -19,6 +19,15 @@ module.exports = router => {
             res.json(products);
           }
         });
+    })
+    .post(function(req, res) {
+      Product.create(req.body, function (err, product) {
+        if (err) {
+          res.status(err.statusCode || 500).json(err);
+        } else {
+          res.json(product);
+        }
+      })
     });
 
 };
