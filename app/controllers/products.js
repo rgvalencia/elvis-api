@@ -128,7 +128,10 @@ module.exports = router => {
 
     router.post('/products/:id/buy', guard.check('client'), function(req, res) {
       Product.findById(req.params.id, function(err, product) {
-        if (err) return res.status(404).json({error: 'This product does not exist'});
+        if (!product) {
+          res.status(404).json({error: 'This product does not exist'});
+        }
+
         if (product.stock < 1) return res.status(422).json({error: 'This product is out of stock'});
 
         let order = new Order({

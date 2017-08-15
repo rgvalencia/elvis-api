@@ -14,6 +14,10 @@ module.exports = router => {
     .exec(function(err, user) {
       if (err) throw err;
 
+      if (req.body.scope !== 'admin') {
+        req.body.scope = 'client'
+      }
+
       if (!user) {
         res.status(422).json({ success: false, message: 'Authentication failed. User not found.' });
       } else if (user) {
@@ -23,7 +27,7 @@ module.exports = router => {
           res.json({
             token: jwt.sign({
               id: user._id,
-              scope: req.body.scope || 'client'
+              scope: req.body.scope
             }, config.secret, {
               expiresIn: '2h'
             })
