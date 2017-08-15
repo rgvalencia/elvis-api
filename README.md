@@ -162,7 +162,7 @@ In order to access these endpoints, you need to provide a json web token. To get
     }
     ```
 
-* PUT /api/users - Allow us to update current user.
+* PUT /api/users/me - Allow us to update current user.
     request:
     ```javascript
     {
